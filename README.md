@@ -12,6 +12,17 @@ It currently supports:
 The project is designed to stay easy to run on a fresh machine, so it uses only
 the Python standard library.
 
+## Why This Project
+
+This project is useful when you want a small, transparent tool for literature
+discovery without depending on a large framework or paid API. It is built for
+quick exploratory searches, especially when you want to:
+
+- enter one or more keywords or phrases
+- search PubMed quickly from a desktop app or terminal
+- export results into JSON for downstream analysis
+- keep the code simple enough to modify for your own workflow
+
 ## Features
 
 - Search with one or more keywords or phrases
@@ -33,6 +44,19 @@ the Python standard library.
 - Internet access for PubMed and Google Scholar queries
 
 No third-party packages are required.
+
+## Installation
+
+Clone the repository and run either the GUI or CLI directly:
+
+```powershell
+git clone https://github.com/LincolnGothic/academic-literature-search.git
+cd .\academic-literature-search
+python .\literature_search_gui.py
+```
+
+If you prefer the command line, you can run `literature_search.py` directly
+without any extra setup.
 
 ## Quick Start
 
@@ -56,6 +80,34 @@ python .\literature_search.py CRISPR --source pubmed --source scholar --format j
 python .\literature_search.py --help
 ```
 
+## Command-Line Examples
+
+Search PubMed only:
+
+```powershell
+python .\literature_search.py "single-cell RNA-seq" --source pubmed --max-results 10
+```
+
+Combine multiple concepts with `OR`:
+
+```powershell
+python .\literature_search.py CRISPR Cas9 --operator or --source pubmed
+```
+
+Save machine-readable output:
+
+```powershell
+python .\literature_search.py cancer immunotherapy --format json --json-out .\results.json
+```
+
+Use environment variables for NCBI settings:
+
+```powershell
+$env:NCBI_EMAIL="you@example.com"
+$env:NCBI_API_KEY="your_api_key"
+python .\literature_search.py Alzheimer biomarker --source pubmed
+```
+
 ## Desktop GUI
 
 The GUI lets you:
@@ -67,6 +119,9 @@ The GUI lets you:
 - Read abstracts and metadata in a detail pane
 - Export the current search to JSON
 
+The GUI is built with Tkinter, so it should run on standard Python
+installations without extra dependencies.
+
 ## PubMed and Google Scholar Notes
 
 - PubMed is the most reliable source for automation in this project.
@@ -75,6 +130,28 @@ The GUI lets you:
 - When Scholar blocks the request, the app reports the problem clearly instead
   of crashing.
 - If you have an NCBI API key, you can provide it to improve PubMed rate limits.
+- Google Scholar support should be treated as best-effort rather than guaranteed.
+
+## Output
+
+Each result can include:
+
+- title
+- authors
+- journal
+- publication date
+- abstract or snippet
+- DOI when available
+- source URL
+
+JSON output is useful if you want to post-process results in Python, R, Excel,
+or another analysis pipeline.
+
+## Development Notes
+
+- The CLI and GUI share the same search engine logic.
+- PubMed integration uses the official NCBI E-utilities endpoints.
+- The project intentionally avoids third-party dependencies to stay portable.
 
 ## Open Source License
 
