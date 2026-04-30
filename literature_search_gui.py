@@ -281,10 +281,13 @@ class LiteratureSearchApp(tk.Tk):
                             "title": item.title,
                             "journal": item.journal or "",
                             "published": item.published or "",
+                            "publication_year": item.publication_year or "",
                             "authors": item.authors,
+                            "abstract": item.abstract or "",
                             "snippet": item.snippet or "",
                             "url": item.url,
                             "doi": item.doi or "",
+                            "pmid": item.pmid or "",
                             "query": query,
                         }
                     )
@@ -355,13 +358,19 @@ class LiteratureSearchApp(tk.Tk):
             lines.append(f"Journal: {item['journal']}")
         if item["published"]:
             lines.append(f"Published: {item['published']}")
+        if item["publication_year"]:
+            lines.append(f"Publication year: {item['publication_year']}")
         if item["authors"]:
             lines.append("Authors: " + ", ".join(item["authors"]))
         if item["doi"]:
             lines.append(f"DOI: {item['doi']}")
+        if item["pmid"]:
+            lines.append(f"PMID: {item['pmid']}")
         lines.append(f"URL: {item['url']}")
-        if item["snippet"]:
-            lines.extend(["", "Summary", item["snippet"]])
+        abstract = item["abstract"] or item["snippet"]
+        if abstract:
+            label = "Abstract" if item["source"] == "pubmed" else "Summary"
+            lines.extend(["", label, abstract])
         self.show_message_details("\n".join(lines))
 
     def show_message_details(self, message: str) -> None:

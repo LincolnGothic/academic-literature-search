@@ -125,11 +125,16 @@ installations without extra dependencies.
 ## PubMed and Google Scholar Notes
 
 - PubMed is the most reliable source for automation in this project.
+- PubMed results include the abstract, PMID, journal, publication year, and
+  author list when those fields are available from NCBI.
 - Google Scholar does not offer a public bulk API and may return blocking
   responses such as HTTP 403 for automated requests.
 - When Scholar blocks the request, the app reports the problem clearly instead
   of crashing.
-- If you have an NCBI API key, you can provide it to improve PubMed rate limits.
+- NCBI asks automated tools to identify themselves. Use `--email`, set
+  `NCBI_EMAIL`, and optionally set `NCBI_API_KEY` or pass `--ncbi-api-key`.
+- NCBI's default E-utilities limit is 3 requests per second. With an API key,
+  the limit is typically 10 requests per second.
 - Google Scholar support should be treated as best-effort rather than guaranteed.
 
 ## Output
@@ -137,10 +142,12 @@ installations without extra dependencies.
 Each result can include:
 
 - title
-- authors
+- full author list
 - journal
 - publication date
-- abstract or snippet
+- publication year
+- abstract
+- PMID for PubMed results
 - DOI when available
 - source URL
 

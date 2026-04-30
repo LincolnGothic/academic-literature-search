@@ -60,10 +60,13 @@ class SearchResult:
     title: str
     url: str
     authors: list[str] = field(default_factory=list)
+    abstract: str | None = None
     journal: str | None = None
+    publication_year: str | None = None
     published: str | None = None
     snippet: str | None = None
     doi: str | None = None
+    pmid: str | None = None
     source_id: str | None = None
 
 
@@ -134,6 +137,13 @@ def build_iso_date(year: str | None, month: str | None = None, day: str | None =
     if day and day.isdigit():
         parts.append(day.zfill(2))
     return "-".join(parts)
+
+
+def extract_year(value: str | None) -> str | None:
+    if not value:
+        return None
+    year_match = re.search(r"\b(19|20)\d{2}\b", value)
+    return year_match.group(0) if year_match else None
 
 
 def extract_pubmed_date(article: ET.Element) -> str | None:
@@ -246,6 +256,8 @@ def search_pubmed(
         pmid = collapse_whitespace(article.findtext("./MedlineCitation/PMID"))
         title = itertext(article.find("./MedlineCitation/Article/ArticleTitle"))
         journal = itertext(article.find("./MedlineCitation/Article/Journal/Title")) or None
+        published = extract_pubmed_date(article)
+        abstract = extract_pubmed_abstract(article)
         doi = None
         for article_id in article.findall("./PubmedData/ArticleIdList/ArticleId"):
             if article_id.attrib.get("IdType") == "doi":
@@ -256,12 +268,15 @@ def search_pubmed(
             SearchResult(
                 source="pubmed",
                 source_id=pmid or None,
+                pmid=pmid or None,
                 title=title or "Untitled article",
                 url=f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/" if pmid else "https://pubmed.ncbi.nlm.nih.gov/",
                 authors=extract_pubmed_authors(article),
+                abstract=abstract or None,
                 journal=journal,
-                published=extract_pubmed_date(article),
-                snippet=extract_pubmed_abstract(article),
+                publication_year=extract_year(published),
+                published=published,
+                snippet=abstract,
                 doi=doi,
             )
         )
@@ -391,6 +406,7 @@ def search_google_scholar(
                 url=url,
                 authors=authors,
                 journal=journal,
+                publication_year=published,
                 published=published,
                 snippet=item.get("snippet") or None,
             )
@@ -503,15 +519,20 @@ def render_text(query: str, results_by_source: dict[str, list[SearchResult]], sn
             if item.published:
                 meta_parts.append(f"Published: {item.published}")
             if item.authors:
-                meta_parts.append("Authors: " + ", ".join(item.authors[:6]))
+                meta_parts.append("Authors: " + ", ".join(item.authors))
             lines.append(" | ".join(meta_parts))
             if item.doi:
                 lines.append(f"DOI: {item.doi}")
+            if item.pmid:
+                lines.append(f"PMID: {item.pmid}")
+            if item.publication_year:
+                lines.append(f"Publication year: {item.publication_year}")
             lines.append(f"URL: {item.url}")
-            snippet = truncate(item.snippet, snippet_length)
-            if snippet:
-                lines.append("Summary:")
-                lines.extend(textwrap.wrap(snippet, width=100))
+            abstract = truncate(item.abstract or item.snippet, snippet_length)
+            if abstract:
+                label = "Abstract:" if item.source == "pubmed" else "Summary:"
+                lines.append(label)
+                lines.extend(textwrap.wrap(abstract, width=100))
             lines.append("")
     return "\n".join(lines).strip() + "\n"
 
