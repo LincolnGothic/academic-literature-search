@@ -131,8 +131,9 @@ installations without extra dependencies.
   responses such as HTTP 403 for automated requests.
 - When Scholar blocks the request, the app reports the problem clearly instead
   of crashing.
-- NCBI asks automated tools to identify themselves. Use `--email`, set
-  `NCBI_EMAIL`, and optionally set `NCBI_API_KEY` or pass `--ncbi-api-key`.
+- NCBI asks automated tools to identify themselves. The app sends a `tool`
+  name automatically; use `--email`, set `NCBI_EMAIL`, and optionally set
+  `NCBI_API_KEY` or pass `--ncbi-api-key`.
 - NCBI's default E-utilities limit is 3 requests per second. With an API key,
   the limit is typically 10 requests per second.
 - Google Scholar support should be treated as best-effort rather than guaranteed.
@@ -159,6 +160,12 @@ or another analysis pipeline.
 - The CLI and GUI share the same search engine logic.
 - PubMed integration uses the official NCBI E-utilities endpoints.
 - The project intentionally avoids third-party dependencies to stay portable.
+
+Run the local test suite with:
+
+```powershell
+python -m unittest discover -v
+```
 
 ## Open Source License
 

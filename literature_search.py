@@ -31,6 +31,7 @@ from typing import Any
 
 
 DEFAULT_USER_AGENT = "literature-search-cli/1.0 (+https://www.ncbi.nlm.nih.gov/)"
+DEFAULT_NCBI_TOOL = "academic_literature_search"
 PUBMED_ESEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
 PUBMED_EFETCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
 SCHOLAR_URL = "https://scholar.google.com/scholar"
@@ -223,6 +224,7 @@ def search_pubmed(
         "retmax": max_results,
         "sort": "pub+date" if sort == "date" else "relevance",
         "term": query,
+        "tool": DEFAULT_NCBI_TOOL,
     }
     if email:
         esearch_params["email"] = email
@@ -239,6 +241,7 @@ def search_pubmed(
         "db": "pubmed",
         "retmode": "xml",
         "id": ",".join(ids),
+        "tool": DEFAULT_NCBI_TOOL,
     }
     if email:
         efetch_params["email"] = email

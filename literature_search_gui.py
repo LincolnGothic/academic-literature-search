@@ -249,26 +249,36 @@ class LiteratureSearchApp(tk.Tk):
         self.status_var.set("Searching academic databases...")
         self.clear_results(reset_payload=False)
 
+        options = {
+            "operator": self.operator_var.get(),
+            "max_results": max(1, int(self.max_results_var.get())),
+            "sort": self.sort_var.get(),
+            "timeout": float(self.timeout_var.get()),
+            "email": self.email_var.get().strip() or None,
+            "api_key": self.api_key_var.get().strip() or None,
+            "scholar_lang": self.scholar_lang_var.get().strip() or "en",
+        }
+
         worker = threading.Thread(
             target=self._search_worker,
-            args=(keywords, sources),
+            args=(keywords, sources, options),
             daemon=True,
         )
         worker.start()
         self.after(150, self._poll_queue)
 
-    def _search_worker(self, keywords: list[str], sources: list[str]) -> None:
+    def _search_worker(self, keywords: list[str], sources: list[str], options: dict[str, Any]) -> None:
         try:
             query, results_by_source, errors, payload = literature_search.run_search(
                 keywords=keywords,
-                operator=self.operator_var.get(),
+                operator=options["operator"],
                 sources=sources,
-                max_results=max(1, int(self.max_results_var.get())),
-                sort=self.sort_var.get(),
-                timeout=float(self.timeout_var.get()),
-                email=self.email_var.get().strip() or None,
-                api_key=self.api_key_var.get().strip() or None,
-                scholar_lang=self.scholar_lang_var.get().strip() or "en",
+                max_results=options["max_results"],
+                sort=options["sort"],
+                timeout=options["timeout"],
+                email=options["email"],
+                api_key=options["api_key"],
+                scholar_lang=options["scholar_lang"],
                 snippet_length=900,
                 quiet_errors=True,
             )
