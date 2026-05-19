@@ -142,5 +142,6 @@ jobs:
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
-          gh release create "${{ github.ref_name }}" release-artifacts/* --generate-notes
+          gh release create "${{ github.ref_name }}" release-artifacts/* --title "${{ github.ref_name }}" --generate-notes
