@@ -171,8 +171,11 @@ class LiteratureSearchApp(tk.Tk):
         ttk.Button(action_bar, text="Export JSON", command=self.export_json).grid(
             row=0, column=3, sticky="e", padx=(8, 0)
         )
-        ttk.Button(action_bar, text="Clear", command=self.clear_results).grid(
+        ttk.Button(action_bar, text="Export CSV", command=self.export_csv).grid(
             row=0, column=4, sticky="e", padx=(8, 0)
+        )
+        ttk.Button(action_bar, text="Clear", command=self.clear_results).grid(
+            row=0, column=5, sticky="e", padx=(8, 0)
         )
 
         body = ttk.Panedwindow(container, orient="horizontal")
@@ -419,6 +422,23 @@ class LiteratureSearchApp(tk.Tk):
         with Path(path).open("w", encoding="utf-8") as handle:
             json.dump(self.current_payload, handle, indent=2, ensure_ascii=False)
             handle.write("\n")
+        self.status_var.set(f"Saved results to {path}")
+
+    def export_csv(self) -> None:
+        if not self.current_payload:
+            messagebox.showinfo("Export CSV", "Run a search before exporting results.")
+            return
+
+        path = filedialog.asksaveasfilename(
+            title="Save literature search results as CSV",
+            defaultextension=".csv",
+            filetypes=[("CSV files", "*.csv"), ("All files", "*.*")],
+            initialfile="literature_results.csv",
+        )
+        if not path:
+            return
+
+        literature_search.write_csv_payload(self.current_payload, path)
         self.status_var.set(f"Saved results to {path}")
 
     def clear_results(self, reset_payload: bool = True) -> None:

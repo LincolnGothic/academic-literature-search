@@ -1,5 +1,8 @@
 import json
+import csv
+import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 import literature_search
@@ -76,6 +79,42 @@ class PubMedMetadataTests(unittest.TestCase):
         self.assertEqual(result_payload["pmid"], "12345678")
         self.assertEqual(result_payload["publication_year"], "2024")
         self.assertEqual(result_payload["doi"], "10.1000/example")
+
+    def test_write_csv_payload_flattens_results_for_spreadsheets(self) -> None:
+        payload = {
+            "query": "metadata",
+            "results": {
+                "pubmed": [
+                    {
+                        "source": "pubmed",
+                        "title": "A careful paper about useful metadata.",
+                        "authors": ["Ada Lovelace", "Grace Hopper"],
+                        "journal": "Journal of Useful Tests",
+                        "publication_year": "2024",
+                        "published": "2024-05-08",
+                        "pmid": "12345678",
+                        "doi": "10.1000/example",
+                        "url": "https://pubmed.ncbi.nlm.nih.gov/12345678/",
+                        "abstract": "Metadata should be easy to export.",
+                        "snippet": "Metadata should be easy to export.",
+                        "source_id": "12345678",
+                    }
+                ]
+            },
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "results.csv"
+            literature_search.write_csv_payload(payload, str(path))
+
+            with path.open("r", encoding="utf-8-sig", newline="") as handle:
+                rows = list(csv.DictReader(handle))
+
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["query"], "metadata")
+        self.assertEqual(rows[0]["authors"], "Ada Lovelace; Grace Hopper")
+        self.assertEqual(rows[0]["pmid"], "12345678")
+        self.assertEqual(rows[0]["abstract"], "Metadata should be easy to export.")
 
 
 if __name__ == "__main__":

@@ -14,6 +14,7 @@ Examples:
 from __future__ import annotations
 
 import argparse
+import csv
 import html
 import json
 import os
@@ -49,6 +50,21 @@ MONTH_LOOKUP = {
     "nov": "11",
     "dec": "12",
 }
+CSV_COLUMNS = [
+    "query",
+    "source",
+    "title",
+    "authors",
+    "journal",
+    "publication_year",
+    "published",
+    "pmid",
+    "doi",
+    "url",
+    "abstract",
+    "snippet",
+    "source_id",
+]
 
 
 class SearchError(Exception):
@@ -438,6 +454,37 @@ def result_to_dict(result: SearchResult, snippet_length: int) -> dict[str, Any]:
     return payload
 
 
+def result_to_csv_row(query: str, result: dict[str, Any]) -> dict[str, str]:
+    row = {column: "" for column in CSV_COLUMNS}
+    row["query"] = query
+    for column in CSV_COLUMNS:
+        if column == "query":
+            continue
+        value = result.get(column)
+        if isinstance(value, list):
+            row[column] = "; ".join(str(item) for item in value)
+        elif value is not None:
+            row[column] = str(value)
+    return row
+
+
+def payload_to_csv_rows(payload: dict[str, Any]) -> list[dict[str, str]]:
+    query = str(payload.get("query", ""))
+    rows: list[dict[str, str]] = []
+    for results in payload.get("results", {}).values():
+        for result in results:
+            rows.append(result_to_csv_row(query, result))
+    return rows
+
+
+def write_csv_payload(payload: dict[str, Any], path: str) -> None:
+    rows = payload_to_csv_rows(payload)
+    with open(path, "w", encoding="utf-8-sig", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=CSV_COLUMNS)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
 def run_search(
     *,
     keywords: list[str],
@@ -585,6 +632,10 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="Optional path to write the JSON payload.",
     )
     parser.add_argument(
+        "--csv-out",
+        help="Optional path to write flattened CSV results.",
+    )
+    parser.add_argument(
         "--snippet-length",
         type=int,
         default=500,
@@ -654,6 +705,9 @@ def main(argv: list[str] | None = None) -> int:
         with open(args.json_out, "w", encoding="utf-8") as handle:
             json.dump(payload, handle, indent=2, ensure_ascii=False)
             handle.write("\n")
+
+    if args.csv_out:
+        write_csv_payload(payload, args.csv_out)
 
     return 0 if any(results_by_source.values()) else 1
 

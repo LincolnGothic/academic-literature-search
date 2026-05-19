@@ -30,7 +30,7 @@ quick exploratory searches, especially when you want to:
 - Choose one or more sources per search
 - Browse results in a desktop interface
 - Open the selected paper in a browser
-- Export structured JSON results
+- Export structured JSON or CSV results
 - Reuse the same search engine from the CLI and the GUI
 
 ## Project Files
@@ -72,6 +72,7 @@ python .\literature_search_gui.py
 python .\literature_search.py cancer immunotherapy
 python .\literature_search.py "graph neural networks" protein folding --source pubmed --max-results 5
 python .\literature_search.py CRISPR --source pubmed --source scholar --format json --json-out .\results.json
+python .\literature_search.py CRISPR --source pubmed --csv-out .\results.csv
 ```
 
 ### See all CLI options
@@ -98,6 +99,7 @@ Save machine-readable output:
 
 ```powershell
 python .\literature_search.py cancer immunotherapy --format json --json-out .\results.json
+python .\literature_search.py cancer immunotherapy --csv-out .\results.csv
 ```
 
 Use environment variables for NCBI settings:
@@ -117,7 +119,7 @@ The GUI lets you:
 - Change result count, sort order, timeout, and optional NCBI settings
 - Review results in a table
 - Read abstracts and metadata in a detail pane
-- Export the current search to JSON
+- Export the current search to JSON or CSV
 
 The GUI is built with Tkinter, so it should run on standard Python
 installations without extra dependencies.
@@ -153,7 +155,7 @@ Each result can include:
 - source URL
 
 JSON output is useful if you want to post-process results in Python, R, Excel,
-or another analysis pipeline.
+or another analysis pipeline. CSV output is flattened for spreadsheet tools.
 
 ## Development Notes
 
