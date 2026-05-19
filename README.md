@@ -64,6 +64,25 @@ python .\literature_search_gui.py
 If you prefer the command line, you can run `literature_search.py` directly
 without any extra setup.
 
+## Downloadable Apps
+
+GitHub Releases can provide ready-to-use builds for each platform:
+
+- Windows: download `academic-literature-search-windows.zip`, unzip it, and run
+  `AcademicLiteratureSearch.exe`.
+- macOS: download `academic-literature-search-macos.zip`, unzip it, and open
+  `Academic Literature Search.app`.
+- Linux: download the `.deb` package and install it with:
+
+```bash
+sudo apt install ./academic-literature-search_0.1.0_all.deb
+```
+
+The Linux package installs both launchers:
+
+- `academic-literature-search`: desktop GUI
+- `literature-search`: command-line tool
+
 ## Quick Start
 
 ### Run the desktop app
@@ -186,6 +205,26 @@ The generated package is written to `dist/` and installs:
 - `academic-literature-search`: desktop GUI launcher
 - `literature-search`: command-line launcher
 - a desktop menu entry for Linux desktop environments
+
+Build local platform packages:
+
+```powershell
+.\packaging\windows\build_windows.ps1
+```
+
+```bash
+./packaging/macos/build_macos.sh
+```
+
+Create a cross-platform GitHub Release by pushing a version tag:
+
+```powershell
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+The release workflow builds Windows, macOS, and Linux artifacts and attaches
+them to the release.
 
 ## Open Source License
 
