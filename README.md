@@ -45,6 +45,12 @@ quick exploratory searches, especially when you want to:
 
 No third-party packages are required.
 
+On Linux desktop systems, install Tkinter if it is not already present:
+
+```bash
+sudo apt install python3-tk
+```
+
 ## Installation
 
 Clone the repository and run either the GUI or CLI directly:
@@ -168,6 +174,18 @@ Run the local test suite with:
 ```powershell
 python -m unittest discover -v
 ```
+
+Build a Debian package for Linux:
+
+```powershell
+python .\packaging\deb\build_deb.py --version 0.1.0
+```
+
+The generated package is written to `dist/` and installs:
+
+- `academic-literature-search`: desktop GUI launcher
+- `literature-search`: command-line launcher
+- a desktop menu entry for Linux desktop environments
 
 ## Open Source License
 
